@@ -41,12 +41,13 @@ class Subscription {
     });
   }
 
-  send(data) {
+  send(data, callback) {
     this.cable.connection_promise.then((con) => {
       if(con.readyState == 1) {
-        con.send(this._create_packet(data));
+        con.send(this._create_packet(data), callback);
       } else {
         this.logger.log('connection is not open');
+        callback(new Error('connection is not open'));
       }
     });
   }
@@ -60,7 +61,7 @@ class Subscription {
 
     return JSON.stringify(packet);
   }
-  
+
   unsubscribe() {
     this.cable.connection.send(JSON.stringify({
       command: 'unsubscribe',
