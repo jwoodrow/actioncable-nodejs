@@ -34,11 +34,11 @@ class Subscription {
     }
   }
 
-  perform(action, data) {
+  perform(action, data, callback) {
     this.send({
       action: action,
       data: data
-    });
+    }, callback);
   }
 
   send(data, callback) {
@@ -63,10 +63,12 @@ class Subscription {
   }
 
   unsubscribe() {
-    this.cable.connection.send(JSON.stringify({
-      command: 'unsubscribe',
-      identifier: JSON.stringify(this.options)
-    }));
+    this.cable.connection_promise.then((con) => {
+      con.send(JSON.stringify({
+        command: 'unsubscribe',
+        identifier: JSON.stringify(this.options)
+      }));
+    });
   };
 };
 
